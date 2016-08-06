@@ -555,7 +555,7 @@ public class LockPatternActivity extends Activity {
             mStealthMode = AlpSettings.Display.isStealthMode(this);
 
         /**
-         * Encrypter.
+         * Encrypter
          */
         char[] encrypterClass;
         if (metaData != null && metaData.containsKey(METADATA_ENCRYPTER_CLASS))
