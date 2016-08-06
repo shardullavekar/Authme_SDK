@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="haibison.android.lockpattern">
+
+    <uses-permission-sdk-23 android:name="android.permission.SYSTEM_ALERT_WINDOW" />
+    <uses-permission-sdk-23 android:name="android.permission.GET_ACCOUNTS" />
+
+    <uses-permission android:name="android.permission.GET_ACCOUNTS" />
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
+
+    <application
+        >
+        <activity
+            android:name=".LockPatternActivity"
+            android:configChanges="keyboard|keyboardHidden|orientation|screenSize|smallestScreenSize|screenLayout"
+            android:excludeFromRecents="true"
+            android:exported="false"
+            android:screenOrientation="user"
+            android:showOnLockScreen="true"
+            android:theme="@style/Alp_42447968.Theme.Light" />
+    </application>
+
+</manifest>
