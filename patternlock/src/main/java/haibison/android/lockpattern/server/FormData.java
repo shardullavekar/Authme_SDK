@@ -1,8 +1,5 @@
 package haibison.android.lockpattern.server;
 
-import android.content.Context;
-import android.content.SharedPreferences;
-import android.preference.PreferenceManager;
 import android.util.Log;
 
 import org.json.JSONArray;
@@ -20,8 +17,7 @@ import haibison.android.lockpattern.sensors.Velocity;
 
 
 public class FormData {
-//    public static final String PREFS_NAME = "SAVEDPATTERN";
-//    public static final String USER_ID = "USERID";
+
 
     private ArrayList<Accelerometer> accelList;
     private ArrayList<Magnetic> magnetics;

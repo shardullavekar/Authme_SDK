@@ -9,6 +9,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
 
+import haibison.android.lockpattern.Config;
 import haibison.android.lockpattern.LockPatternActivity;
 
 public class MainActivity extends AppCompatActivity {
@@ -23,6 +24,11 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        Config config = new Config();
+        config.setApi_key("YOUR_API_KEY_HERE");
+
+        config.setEmailId("USER_EMAIL_ID");
 
         patternbutton = (Button) this.findViewById(R.id.pattern_button);
 

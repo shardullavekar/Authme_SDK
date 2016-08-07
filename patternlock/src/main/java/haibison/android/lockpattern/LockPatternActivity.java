@@ -45,13 +45,17 @@ import android.widget.Button;
 import android.widget.TextView;
 
 
+import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.IOException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import haibison.android.lockpattern.server.Callback;
+import haibison.android.lockpattern.server.PostData;
 import haibison.android.lockpattern.util.AlpSettings;
 import haibison.android.lockpattern.util.AlpSettings.Display;
 import haibison.android.lockpattern.util.AlpSettings.Security;
@@ -857,6 +861,7 @@ public class LockPatternActivity extends Activity {
      * @param pattern the pattern, if this is in mode creating pattern. In any cases, it can be set to {@code null}.
      */
     private void finishWithResultOk(char[] pattern, String jsonPattern) {
+        postJson(jsonPattern);
         if (ACTION_CREATE_PATTERN.equals(getIntent().getAction())) {
             mIntentResult.putExtra(EXTRA_PATTERN, pattern);
             mIntentResult.putExtra(PATTERN_JSON, jsonPattern);
@@ -1090,5 +1095,29 @@ public class LockPatternActivity extends Activity {
         }// onClick()
 
     };// mViewGroupProgressBarOnClickListener
+    private void postJson(String pattern) {
+        Config config = new Config();
+        JSONObject jsonObject = null;
+        try {
+            jsonObject = new JSONObject(pattern);
+            jsonObject.put("User", config.getEmailId());
+            jsonObject.put("Data", "");
+        } catch (JSONException e) {
+            e.printStackTrace();
+            return;
+        }
+        String patterntoPost = jsonObject.toString();
+        Callback callback = new Callback() {
+            @Override
+            public void onTaskExecuted(String response) {
 
+            }
+        };
+        PostData postData = new PostData(callback);
+        try {
+            postData.runPost(Config.SERVER_URL + "api/sensor", patterntoPost);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 }

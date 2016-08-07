@@ -7,7 +7,6 @@ import android.os.Handler;
 import android.text.TextUtils;
 import android.util.Log;
 
-import com.squareup.okhttp.FormEncodingBuilder;
 import com.squareup.okhttp.MediaType;
 import com.squareup.okhttp.OkHttpClient;
 import com.squareup.okhttp.Request;
@@ -25,6 +24,8 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.util.concurrent.TimeUnit;
 
+import haibison.android.lockpattern.Config;
+
 
 public class PostData {
     public static final MediaType JSON
@@ -37,6 +38,7 @@ public class PostData {
     Callback callback;
     JSONObject keys;
     Activity activity;
+
     public PostData(Callback callback) {
         this.callback = callback;
         client = new OkHttpClient();
@@ -100,10 +102,11 @@ public class PostData {
         @Override
         protected String doInBackground(haibison.android.lockpattern.server.PostRequest... uri) {
 
-
+            Config config = new Config();
             RequestBody body = RequestBody.create(JSON, uri[0].getBody().getBytes());
             Request request = new Request.Builder()
                     .url(uri[0].getUrl())
+                    .addHeader("X-API-KEY", config.getApi_key())
                     .post(body)
                     .build();
             Response response = null;
@@ -128,71 +131,11 @@ public class PostData {
         }
     }
 
-
-
-    public void runGet(final String url) {
-        AsyncTask<String, String, String> getRequestTest = new GetRequestTest();
-        getRequestTest.execute(url);
-    }
-
     void post(String url, String json) throws IOException {
         AsyncTask<PostRequest, String, String> postRequestExecutor = new PostRequestExecutor();
         PostRequest post = new PostRequest(url, "POST");
         post.setBody(json);
         postRequestExecutor.execute(post);
-    }
-
-    public void postStatus(String url, String status) {
-        RequestBody formBody = new FormEncodingBuilder()
-                               .add("status", status)
-                               .build();
-        final Request request = new Request.Builder()
-                .url(url)
-                .post(formBody)
-                .build();
-
-        Runnable postrunner = new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    Response response = client.newCall(request).execute();
-                    Log.d("StatusResponse", response.body().string());
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-        };
-        Thread t = new Thread(postrunner);
-        t.start();
-
-    }
-
-    public void resetStatus(String url) {
-        RequestBody formBody = new FormEncodingBuilder()
-                .build();
-        final Request request = new Request.Builder()
-                .url(url)
-                .post(formBody)
-                .build();
-
-        Runnable postrunner = new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    Response response = client.newCall(request).execute();
-                    Log.d("ResetResult", response.body().string());
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-        };
-        Thread t = new Thread(postrunner);
-        t.start();
-
-    }
-
-    public void getKeys() {
-        new ExecuteGet().execute();
     }
 
     private class ExecuteGet extends AsyncTask<Void, Void, String> {
