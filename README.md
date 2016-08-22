@@ -16,6 +16,9 @@ API KEY is a prerequisite - please get in touch with us before you start integra
 If the pattern is set already, call the Activity to compare the set pattern.
 
 Else, call the activity to create a user pattern.
+
+![Creating user pattern](https://github.com/shardullavekar/Authme_SDK/blob/master/1.png)
+
 - - - - - - - - - - - - - - - - - - - - -
         savedPattern = this.getSharedPreferences(PREFERENCES, Context.MODE_PRIVATE);
         String stringArray = savedPattern.getString("myByteArray", null);
