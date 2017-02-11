@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="haibison.android.lockpattern">
+    package="io.authme.sdk">
 
     <uses-permission-sdk-23 android:name="android.permission.SYSTEM_ALERT_WINDOW" />
     <uses-permission-sdk-23 android:name="android.permission.GET_ACCOUNTS" />
@@ -11,7 +11,7 @@
     <application
         >
         <activity
-            android:name=".LockPatternActivity"
+            android:name="haibison.android.pattern.LockPatternActivity"
             android:configChanges="keyboard|keyboardHidden|orientation|screenSize|smallestScreenSize|screenLayout"
             android:excludeFromRecents="true"
             android:exported="false"

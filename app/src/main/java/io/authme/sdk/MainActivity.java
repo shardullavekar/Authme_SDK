@@ -1,16 +1,13 @@
 package io.authme.sdk;
 
-import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.Button;
-import android.widget.Toast;
 
-import haibison.android.lockpattern.Config;
-import haibison.android.lockpattern.LockPatternActivity;
+
 
 public class MainActivity extends AppCompatActivity {
     private static final int REQ_CREATE_PATTERN = 1;
@@ -25,10 +22,10 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        Config config = new Config();
-        config.setApi_key("YOUR_API_KEY_HERE");
-
-        config.setEmailId("USER_EMAIL_ID");
+//        Config config = new Config();
+//        config.setApi_key("YOUR_API_KEY_HERE");
+//
+//        config.setEmailId("USER_EMAIL_ID");
 
         patternbutton = (Button) this.findViewById(R.id.pattern_button);
 
@@ -41,68 +38,62 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void callPatternActivity() {
-        savedPattern = this.getSharedPreferences(PREFERENCES, Context.MODE_PRIVATE);
-        String stringArray = savedPattern.getString("myByteArray", null);
-        if (stringArray != null) {
-            char[] charArray = stringArray.toCharArray();
-            Intent intent = new Intent(LockPatternActivity.ACTION_COMPARE_PATTERN, null,
-                    MainActivity.this, LockPatternActivity.class);
-            intent.putExtra(LockPatternActivity.EXTRA_PATTERN, charArray);
-            startActivityForResult(intent, REQ_ENTER_PATTERN);
-        } else {
-            Intent intent = new Intent(LockPatternActivity.ACTION_CREATE_PATTERN, null, MainActivity.this, LockPatternActivity.class);
-            startActivityForResult(intent, REQ_CREATE_PATTERN);
-        }
+//        savedPattern = this.getSharedPreferences(PREFERENCES, Context.MODE_PRIVATE);
+//        String stringArray = savedPattern.getString("myByteArray", null);
+//        if (stringArray != null) {
+//            char[] charArray = stringArray.toCharArray();
+//            Intent intent = new Intent(LockPatternActivity.ACTION_COMPARE_PATTERN, null,
+//                    MainActivity.this, LockPatternActivity.class);
+//            intent.putExtra(LockPatternActivity.EXTRA_PATTERN, charArray);
+//            startActivityForResult(intent, REQ_ENTER_PATTERN);
+//        } else {
+//            Intent intent = new Intent(LockPatternActivity.ACTION_CREATE_PATTERN, null, MainActivity.this, LockPatternActivity.class);
+//            startActivityForResult(intent, REQ_CREATE_PATTERN);
+//        }
     }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        switch (requestCode) {
-            case REQ_CREATE_PATTERN: {
-                switch (resultCode) {
-                    case RESULT_OK:
-                        Toast.makeText(MainActivity.this, "Pattern Created", Toast.LENGTH_LONG).show();
-                        char[] pattern = data.getCharArrayExtra(LockPatternActivity.EXTRA_PATTERN);
-                        savePattern(pattern);
-                        break;
-                    case RESULT_CANCELED:
-                        Toast.makeText(MainActivity.this, "User Canceled", Toast.LENGTH_SHORT).show();
-                        break;
-                    default:
-                        break;
-                }
-
-            } break;
-
-            case REQ_ENTER_PATTERN: {
-                switch (resultCode) {
-                    case RESULT_OK:
-                        Toast.makeText(MainActivity.this, "User Matched", Toast.LENGTH_LONG).show();
-                        break;
-                    case RESULT_CANCELED:
-                        Toast.makeText(MainActivity.this, "User Canceled", Toast.LENGTH_SHORT).show();
-                        break;
-                    case LockPatternActivity.RESULT_FAILED:
-                        Toast.makeText(MainActivity.this, "Failed to identify", Toast.LENGTH_SHORT).show();
-                        break;
-                    case LockPatternActivity.RESULT_FORGOT_PATTERN:
-                        Toast.makeText(MainActivity.this, "Forgot pattern", Toast.LENGTH_SHORT).show();
-                        break;
-                    default:
-                        break;
-                }
-            } break;
-
-            default:
-                break;
-
-        }
+//        switch (requestCode) {
+//            case REQ_CREATE_PATTERN: {
+//                switch (resultCode) {
+//                    case RESULT_OK:
+//                        Toast.makeText(MainActivity.this, "Pattern Created", Toast.LENGTH_LONG).show();
+//                        char[] pattern = data.getCharArrayExtra(LockPatternActivity.EXTRA_PATTERN);
+//                        savePattern(pattern);
+//                        break;
+//                    case RESULT_CANCELED:
+//                        Toast.makeText(MainActivity.this, "User Canceled", Toast.LENGTH_SHORT).show();
+//                        break;
+//                    default:
+//                        break;
+//                }
+//
+//            } break;
+//
+//            case REQ_ENTER_PATTERN: {
+//                switch (resultCode) {
+//                    case RESULT_OK:
+//                        Toast.makeText(MainActivity.this, "User Matched", Toast.LENGTH_LONG).show();
+//                        break;
+//                    case RESULT_CANCELED:
+//                        Toast.makeText(MainActivity.this, "User Canceled", Toast.LENGTH_SHORT).show();
+//                        break;
+//                    case LockPatternActivity.RESULT_FAILED:
+//                        Toast.makeText(MainActivity.this, "Failed to identify", Toast.LENGTH_SHORT).show();
+//                        break;
+//                    case LockPatternActivity.RESULT_FORGOT_PATTERN:
+//                        Toast.makeText(MainActivity.this, "Forgot pattern", Toast.LENGTH_SHORT).show();
+//                        break;
+//                    default:
+//                        break;
+//                }
+//            } break;
+//
+//            default:
+//                break;
+//
+//        }
     }
 
-    private void savePattern(char[] pattern) {
-        String arrayString = new String(pattern);
-        SharedPreferences.Editor editor = savedPattern.edit();
-        editor.putString("myByteArray", arrayString);
-        editor.commit();
-    }
 }
