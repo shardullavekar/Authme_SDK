@@ -24,10 +24,34 @@ public class Config {
     public static final String SANDBOX_SERVER_URL = SANDBOX_HOST + ":3000/";
 
     private static final String STORED_VALUES = "STORED_VALUES";
-    private static final String API_KEY = "API_KEY", BYTE_ARRAY = "BYTE_ARRAY", USER_ID = "USERID";
+    private static final String API_KEY = "API_KEY", BYTE_ARRAY = "BYTE_ARRAY", EMAIL= "emailId", DEVICE_ID = "deviceId";
     private SharedPreferences userpreference;
     private SharedPreferences.Editor editor;
     private Activity activity;
+    private String emailId, deviceId;
+
+
+    public String getEmailId() {
+        return userpreference.getString(EMAIL, null);
+    }
+
+    public void setEmailId(String emailId) {
+        this.emailId = emailId;
+        editor.putString(EMAIL, emailId);
+        editor.apply();
+        editor.commit();
+    }
+
+    public String getDeviceId() {
+        return userpreference.getString(DEVICE_ID, null);
+    }
+
+    public void setDeviceId(String deviceId) {
+        this.deviceId = deviceId;
+        editor.putString(DEVICE_ID, deviceId);
+        editor.apply();
+        editor.commit();
+    }
 
     public Config(Activity activity) {
         this.activity = activity;
@@ -55,16 +79,6 @@ public class Config {
     public String getPatternString() {
         String stringArray = userpreference.getString(BYTE_ARRAY, null);
         return stringArray;
-    }
-
-    public void setUserId(String userId) {
-        editor.putString(USER_ID, userId);
-        editor.apply();
-        editor.commit();
-    }
-
-    public String getUserId() {
-        return userpreference.getString(USER_ID, null);
     }
 
 }

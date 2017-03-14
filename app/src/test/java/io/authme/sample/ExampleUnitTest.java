@@ -1,4 +1,4 @@
-package io.authme.sdk;
+package io.authme.sample;
 
 import org.junit.Test;
 

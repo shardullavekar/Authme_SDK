@@ -1,33 +1,28 @@
-package io.authme.sdk;
+package io.authme.sample;
 
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.Button;
-
+import io.authme.sdk.server.Config;
 
 
 public class MainActivity extends AppCompatActivity {
-    private static final int REQ_CREATE_PATTERN = 1;
-    private static final int REQ_ENTER_PATTERN = 2;
-    private static final String PREFERENCES = "savedpreferences";
 
     Button patternbutton;
-    SharedPreferences savedPattern;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        setContentView(io.authme.sdk.R.layout.activity_main);
 
-        Config config = new Config();
-        config.setApi_key("YOUR_API_KEY_HERE");
+        Config config = new Config(MainActivity.this);
+        config.setAPIKey("YOUR_API_KEY_HERE");
 
         config.setEmailId("USER_EMAIL_ID");
 
-        patternbutton = (Button) this.findViewById(R.id.pattern_button);
+        patternbutton = (Button) this.findViewById(io.authme.sdk.R.id.pattern_button);
 
         patternbutton.setOnClickListener(new View.OnClickListener() {
             @Override
