@@ -14,6 +14,10 @@ package io.authme.sdk.server;
 
 import android.app.Activity;
 import android.content.SharedPreferences;
+import android.text.TextUtils;
+import android.widget.Toast;
+
+import java.util.UUID;
 
 public class Config {
 
@@ -24,7 +28,8 @@ public class Config {
     public static final String SANDBOX_SERVER_URL = SANDBOX_HOST + ":3000/";
 
     private static final String STORED_VALUES = "STORED_VALUES";
-    private static final String API_KEY = "API_KEY", BYTE_ARRAY = "BYTE_ARRAY", EMAIL= "emailId", DEVICE_ID = "deviceId";
+    private static final String API_KEY = "API_KEY", BYTE_ARRAY = "BYTE_ARRAY", EMAIL= "emailId",
+            DEVICE_ID = "deviceId", ENVIRONMENT = "environment", PRODUCTION = "PROD", SANDBOX = "TEST";
     private SharedPreferences userpreference;
     private SharedPreferences.Editor editor;
     private Activity activity;
@@ -43,7 +48,11 @@ public class Config {
     }
 
     public String getDeviceId() {
-        return userpreference.getString(DEVICE_ID, null);
+        String deviceId = userpreference.getString(DEVICE_ID, null);
+        if (TextUtils.isEmpty(deviceId)) {
+            return String.valueOf(UUID.randomUUID());
+        }
+        return deviceId;
     }
 
     public void setDeviceId(String deviceId) {
@@ -79,6 +88,28 @@ public class Config {
     public String getPatternString() {
         String stringArray = userpreference.getString(BYTE_ARRAY, null);
         return stringArray;
+    }
+
+    public void setEnvironment(String environment) {
+        if (!TextUtils.equals(environment, PRODUCTION) || !TextUtils.equals(environment, SANDBOX)) {
+            Toast.makeText(this.activity, "Invalid Environment", Toast.LENGTH_LONG)
+                    .show();
+            return;
+        }
+        editor.putString(ENVIRONMENT, environment);
+        editor.apply();
+        editor.commit();
+    }
+
+    public String getServerURL() {
+        String environment = userpreference.getString(ENVIRONMENT, null);
+
+        if (TextUtils.equals(environment, PRODUCTION)) {
+            return PROD_SERVER_URL;
+        }
+        else {
+            return SANDBOX_SERVER_URL;
+        }
     }
 
 }

@@ -18,6 +18,7 @@ package io.authme.sdk;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
@@ -30,16 +31,20 @@ import org.json.JSONObject;
 
 import java.io.IOException;
 import java.security.InvalidKeyException;
+import java.util.UUID;
 
 import io.authme.sdk.server.Callback;
 import io.authme.sdk.server.Config;
+import io.authme.sdk.server.PostData;
+
+import static org.jivesoftware.smackx.xhtmlim.XHTMLText.P;
 
 
 public class AuthScreen extends Activity {
 
-    private static final int ENTER_PATTERN = 2, CREATE_PATTERN = 1;
+    private static final int LOGIN_PATTERN = 2, SIGNUP_PATTERN = 1;
     private static final String AUTHMEIO = "AUTHMEIO";
-    private String referenceId, userId, hash, otp, action;
+    private String referenceId;
     private Config config;
 
     public AuthScreen() {
@@ -49,10 +54,12 @@ public class AuthScreen extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         config = new Config(AuthScreen.this);
-        action = getIntent().getStringExtra("action");
-        referenceId = getIntent().getStringExtra("referenceId");
-        userId = getIntent().getStringExtra("userId");
-        otp = getIntent().getStringExtra("otp");
+        if (getIntent().hasExtra("referenceId")) {
+            referenceId = getIntent().getStringExtra("referenceId");
+        }
+        else {
+            referenceId = UUID.randomUUID().toString();
+        }
         startExecution();
     }
 
@@ -79,27 +86,17 @@ public class AuthScreen extends Activity {
     }
 
     private void startExecution() {
-        if (TextUtils.equals(action, "signin")) {
-            String stringArray = config.getPatternString();
-            if (TextUtils.isEmpty(stringArray)) {
+        String stringArray = config.getPatternString();
 
-            }
-            else {
-                char[] charArray = stringArray.toCharArray();
-                Intent intent = new Intent(AuthScreen.this, LockPatternActivity.class);
-                intent.setAction(LockPatternActivity.ACTION_COMPARE_PATTERN);
-                intent.putExtra(LockPatternActivity.EXTRA_PATTERN, charArray);
-                startActivityForResult(intent, ENTER_PATTERN);
-            }
-
-        }
-        else if (TextUtils.equals(action, "signup")) {
-
+        if (!TextUtils.isEmpty(stringArray.toString())) {
+            char[] charArray = stringArray.toCharArray();
+            Intent intent = new Intent(AuthScreen.this, LockPatternActivity.class);
+            intent.setAction(LockPatternActivity.ACTION_COMPARE_PATTERN);
+            intent.putExtra(LockPatternActivity.EXTRA_PATTERN, charArray);
+            startActivityForResult(intent, LOGIN_PATTERN);
         }
         else {
-            Toast.makeText(getApplicationContext(), "Action Not Recognized", Toast.LENGTH_LONG).show();
-            endActivity(RESULT_CANCELED);
-            return;
+            //signup
         }
 
     }
@@ -107,12 +104,12 @@ public class AuthScreen extends Activity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         switch (requestCode) {
-            case CREATE_PATTERN: {
+            case SIGNUP_PATTERN: {
                 switch (resultCode) {
                     case RESULT_OK:
                         char[] pattern = data.getCharArrayExtra(LockPatternActivity.EXTRA_PATTERN);
                         config.setByteArray(pattern);
-                        endActivity(CREATE_PATTERN);
+                        completeSignup();
                         break;
                     case RESULT_CANCELED:
                         endActivity(RESULT_CANCELED);
@@ -123,7 +120,7 @@ public class AuthScreen extends Activity {
             }
             break;
 
-            case ENTER_PATTERN: {
+            case LOGIN_PATTERN: {
                 switch (resultCode) {
                     case RESULT_OK:
                         try {
@@ -131,7 +128,7 @@ public class AuthScreen extends Activity {
                         } catch (JSONException | InvalidKeyException e) {
                             Toast.makeText(AuthScreen.this, "Failed to post result: " + e.getMessage(), Toast.LENGTH_SHORT).show();
                         }
-                        endActivity(ENTER_PATTERN);
+                        endActivity(LOGIN_PATTERN);
                         break;
                     case RESULT_CANCELED:
                         clearJson();
@@ -232,4 +229,49 @@ public class AuthScreen extends Activity {
         AuthScreen.this.finish();
     }
 
+
+    private void completeSignup() {
+
+    }
+
+    private class SignupUser extends AsyncTask<Void, Void, Void> {
+
+        @Override
+        protected Void doInBackground(Void... params) {
+            postRequest();
+            return null;
+        }
+
+        private String postRequest() {
+            JSONObject request = new JSONObject();
+            try {
+                request.put("Identifier", config.getDeviceId());
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+            try {
+                request.put("Email", config.getEmailId());
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+            try {
+                new PostData(new Callback() {
+
+                    @Override
+                    public void onTaskExecuted(String response) {
+
+                    }
+                }).runPost(config.getServerURL() + "user/new", request.toString());
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            super.onPostExecute(aVoid);
+
+        }
+    }
 }
