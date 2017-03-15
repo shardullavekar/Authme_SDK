@@ -45,10 +45,10 @@ public class PostData {
 
     OkHttpClient client;
     private static Handler handler = new Handler();
-    Runnable postrunner;
     Callback callback;
     JSONObject keys;
     Activity activity;
+    Config config;
     public PostData(Callback callback) {
         this.callback = callback;
         client = new OkHttpClient();
@@ -60,6 +60,7 @@ public class PostData {
     public PostData(Callback callback, Activity activity) {
         this(callback);
         this.activity = activity;
+        config = new Config(activity);
     }
 
     public void runPost(final String url, final String json) throws IOException {
@@ -221,7 +222,7 @@ public class PostData {
         @Override
         protected String doInBackground(Void... params) {
             Request request = new Request.Builder()
-                    .url(Config.PROD_SERVER_URL + "key/new")
+                    .url(config.getServerURL() + "key/new")
                     .build();
             Response response = null;
             try {

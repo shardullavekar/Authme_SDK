@@ -37,12 +37,15 @@ import io.authme.sdk.server.Callback;
 import io.authme.sdk.server.Config;
 import io.authme.sdk.server.PostData;
 
-import static org.jivesoftware.smackx.xhtmlim.XHTMLText.P;
+import static io.authme.sdk.server.Config.FORGOT_PATTERN;
+import static io.authme.sdk.server.Config.INVALID_CONFIG;
+import static io.authme.sdk.server.Config.LOGIN_PATTERN;
+import static io.authme.sdk.server.Config.RESULT_FAILED;
+import static io.authme.sdk.server.Config.SIGNUP_PATTERN;
 
 
 public class AuthScreen extends Activity {
 
-    private static final int LOGIN_PATTERN = 2, SIGNUP_PATTERN = 1;
     private static final String AUTHMEIO = "AUTHMEIO";
     private String referenceId;
     private Config config;
@@ -54,12 +57,19 @@ public class AuthScreen extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         config = new Config(AuthScreen.this);
+
+        if (!config.isValidConfig()) {
+            endActivity(INVALID_CONFIG);
+            return;
+        }
+
         if (getIntent().hasExtra("referenceId")) {
             referenceId = getIntent().getStringExtra("referenceId");
         }
         else {
             referenceId = UUID.randomUUID().toString();
         }
+
         startExecution();
     }
 
@@ -88,7 +98,7 @@ public class AuthScreen extends Activity {
     private void startExecution() {
         String stringArray = config.getPatternString();
 
-        if (!TextUtils.isEmpty(stringArray.toString())) {
+        if (!TextUtils.isEmpty(stringArray)) {
             char[] charArray = stringArray.toCharArray();
             Intent intent = new Intent(AuthScreen.this, LockPatternActivity.class);
             intent.setAction(LockPatternActivity.ACTION_COMPARE_PATTERN);
@@ -96,7 +106,9 @@ public class AuthScreen extends Activity {
             startActivityForResult(intent, LOGIN_PATTERN);
         }
         else {
-            //signup
+            Intent intent = new Intent(AuthScreen.this, LockPatternActivity.class);
+            intent.setAction(LockPatternActivity.ACTION_CREATE_PATTERN);
+            startActivityForResult(intent, SIGNUP_PATTERN);
         }
 
     }
@@ -128,20 +140,20 @@ public class AuthScreen extends Activity {
                         } catch (JSONException | InvalidKeyException e) {
                             Toast.makeText(AuthScreen.this, "Failed to post result: " + e.getMessage(), Toast.LENGTH_SHORT).show();
                         }
-                        endActivity(LOGIN_PATTERN);
                         break;
                     case RESULT_CANCELED:
                         clearJson();
                         endActivity(RESULT_CANCELED);
                         break;
-                    case LockPatternActivity.RESULT_FAILED:
+                    case RESULT_FAILED:
                         Toast.makeText(AuthScreen.this, "Failed to identify", Toast.LENGTH_SHORT).show();
                         clearJson();
-                        endActivity(RESULT_CANCELED);
+                        endActivity(RESULT_FAILED);
                         break;
-                    case LockPatternActivity.RESULT_FORGOT_PATTERN:
+                    case FORGOT_PATTERN:
                         Toast.makeText(AuthScreen.this, "Forgot pattern", Toast.LENGTH_SHORT).show();
                         clearJson();
+                        endActivity(FORGOT_PATTERN);
                         break;
                 }
             }
@@ -168,8 +180,8 @@ public class AuthScreen extends Activity {
     private void callOtpVerify() {
         JSONObject otpObject = new JSONObject();
         try {
-            otpObject.put("User", userId);
-            otpObject.put("Otp", otp);
+            otpObject.put("User", config.getEmailId());
+            otpObject.put("Otp", config.getOTP());
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -177,14 +189,14 @@ public class AuthScreen extends Activity {
         Callback otp_callback = new Callback() {
             @Override
             public void onTaskExecuted(String response) {
-
+                //what to expect here
             }
         };
 
         io.authme.sdk.server.PostData postOtp = new io.authme.sdk.server.PostData(otp_callback);
 
         try {
-            postOtp.runPost(io.authme.sdk.server.Config.PROD_SERVER_URL + "api/otp", otpObject.toString());
+            postOtp.runPost(config.getServerURL() + "api/otp", otpObject.toString());
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -198,7 +210,7 @@ public class AuthScreen extends Activity {
             try {
                 jsonObject = new JSONObject(biggerJson);
                 jsonObject.put("OrderId", referenceId);
-                jsonObject.put("User", userId);
+                jsonObject.put("User", config.getEmailId());
             } catch (JSONException e) {
                 e.printStackTrace();
             }
@@ -206,19 +218,18 @@ public class AuthScreen extends Activity {
             return;
         }
 
-        jsonObject.put("Otp", otp);
+        jsonObject.put("Otp", config.getOTP());
 
         Callback callback = new Callback() {
             @Override
             public void onTaskExecuted(String response) {
-
+                endActivity(LOGIN_PATTERN, response);
             }
         };
 
         io.authme.sdk.server.PostData postData = new io.authme.sdk.server.PostData(callback);
-        Log.d("AUTHMEIO", "Post data to sensor api : " + jsonObject);
         try {
-            postData.runPost(io.authme.sdk.server.Config.PROD_SERVER_URL + "api/sensor", jsonObject.toString());
+            postData.runPost(config.getServerURL() + "api/sensor", jsonObject.toString());
         } catch (IOException e) {
             Log.e(AUTHMEIO, "Failed to post result to sensor: ", e);
         }
@@ -229,12 +240,39 @@ public class AuthScreen extends Activity {
         AuthScreen.this.finish();
     }
 
+    private void endActivity(int result, String data) {
+        Intent intent = new Intent();
+        intent.putExtra("response", data);
+        setResult(result, intent);
+    }
 
     private void completeSignup() {
+        Callback callback = new Callback() {
+            @Override
+            public void onTaskExecuted(String response) {
+                JSONObject jsonObject;
+                try {
+                    jsonObject = new JSONObject(response);
+                    if (jsonObject.getInt("Status") == 201) {
+                        JSONObject data = jsonObject.getJSONObject("Data");
+                        config.setSecretKey(data.getString("Key"));
+                        endActivity(SIGNUP_PATTERN);
+                    }
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+        };
+
+        new SignupUser(callback).execute();
 
     }
 
     private class SignupUser extends AsyncTask<Void, Void, Void> {
+        Callback callback;
+        public SignupUser(Callback callback) {
+            this.callback = callback;
+        }
 
         @Override
         protected Void doInBackground(Void... params) {
@@ -242,7 +280,7 @@ public class AuthScreen extends Activity {
             return null;
         }
 
-        private String postRequest() {
+        private void postRequest() {
             JSONObject request = new JSONObject();
             try {
                 request.put("Identifier", config.getDeviceId());
@@ -255,13 +293,7 @@ public class AuthScreen extends Activity {
                 e.printStackTrace();
             }
             try {
-                new PostData(new Callback() {
-
-                    @Override
-                    public void onTaskExecuted(String response) {
-
-                    }
-                }).runPost(config.getServerURL() + "user/new", request.toString());
+                new PostData(callback).runPost(config.getServerURL() + "user/new", request.toString());
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -271,7 +303,6 @@ public class AuthScreen extends Activity {
         @Override
         protected void onPostExecute(Void aVoid) {
             super.onPostExecute(aVoid);
-
         }
     }
 }

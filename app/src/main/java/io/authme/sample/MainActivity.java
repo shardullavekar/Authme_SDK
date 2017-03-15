@@ -5,24 +5,31 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.Button;
+import android.widget.Toast;
+
+import io.authme.sdk.AuthScreen;
 import io.authme.sdk.server.Config;
 
 
 public class MainActivity extends AppCompatActivity {
 
     Button patternbutton;
+    private static final int RESULT = 1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(io.authme.sdk.R.layout.activity_main);
+        setContentView(R.layout.activity_main);
 
         Config config = new Config(MainActivity.this);
+
+        config.setEnvironment(Config.PRODUCTION);
+
         config.setAPIKey("YOUR_API_KEY_HERE");
 
         config.setEmailId("USER_EMAIL_ID");
 
-        patternbutton = (Button) this.findViewById(io.authme.sdk.R.id.pattern_button);
+        patternbutton = (Button) this.findViewById(R.id.pattern_button);
 
         patternbutton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -33,62 +40,43 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void callPatternActivity() {
-//        savedPattern = this.getSharedPreferences(PREFERENCES, Context.MODE_PRIVATE);
-//        String stringArray = savedPattern.getString("myByteArray", null);
-//        if (stringArray != null) {
-//            char[] charArray = stringArray.toCharArray();
-//            Intent intent = new Intent(LockPatternActivity.ACTION_COMPARE_PATTERN, null,
-//                    MainActivity.this, LockPatternActivity.class);
-//            intent.putExtra(LockPatternActivity.EXTRA_PATTERN, charArray);
-//            startActivityForResult(intent, REQ_ENTER_PATTERN);
-//        } else {
-//            Intent intent = new Intent(LockPatternActivity.ACTION_CREATE_PATTERN, null, MainActivity.this, LockPatternActivity.class);
-//            startActivityForResult(intent, REQ_CREATE_PATTERN);
-//        }
+        Intent intent = new Intent(MainActivity.this, AuthScreen.class);
+        startActivityForResult(intent, RESULT);
     }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-//        switch (requestCode) {
-//            case REQ_CREATE_PATTERN: {
-//                switch (resultCode) {
-//                    case RESULT_OK:
-//                        Toast.makeText(MainActivity.this, "Pattern Created", Toast.LENGTH_LONG).show();
-//                        char[] pattern = data.getCharArrayExtra(LockPatternActivity.EXTRA_PATTERN);
-//                        savePattern(pattern);
-//                        break;
-//                    case RESULT_CANCELED:
-//                        Toast.makeText(MainActivity.this, "User Canceled", Toast.LENGTH_SHORT).show();
-//                        break;
-//                    default:
-//                        break;
-//                }
-//
-//            } break;
-//
-//            case REQ_ENTER_PATTERN: {
-//                switch (resultCode) {
-//                    case RESULT_OK:
-//                        Toast.makeText(MainActivity.this, "User Matched", Toast.LENGTH_LONG).show();
-//                        break;
-//                    case RESULT_CANCELED:
-//                        Toast.makeText(MainActivity.this, "User Canceled", Toast.LENGTH_SHORT).show();
-//                        break;
-//                    case LockPatternActivity.RESULT_FAILED:
-//                        Toast.makeText(MainActivity.this, "Failed to identify", Toast.LENGTH_SHORT).show();
-//                        break;
-//                    case LockPatternActivity.RESULT_FORGOT_PATTERN:
-//                        Toast.makeText(MainActivity.this, "Forgot pattern", Toast.LENGTH_SHORT).show();
-//                        break;
-//                    default:
-//                        break;
-//                }
-//            } break;
-//
-//            default:
-//                break;
-//
-//        }
+        switch (requestCode) {
+            case RESULT : {
+                switch (resultCode) {
+                    case Config.SIGNUP_PATTERN : {
+                        Toast.makeText(getApplicationContext(), "Sign up successfull", Toast.LENGTH_LONG)
+                                .show();
+                    } break;
+
+                    case Config.LOGIN_PATTERN : {
+                        Toast.makeText(getApplicationContext(), data.getStringExtra("response"), Toast.LENGTH_LONG)
+                                .show();
+                    } break;
+
+                    case Config.FORGOT_PATTERN : {
+                        Toast.makeText(getApplicationContext(), "Forgot Pattern", Toast.LENGTH_LONG)
+                                .show();
+                    } break;
+
+                    case Config.RESULT_FAILED : {
+                        Toast.makeText(getApplicationContext(), "Failed To Identify", Toast.LENGTH_LONG)
+                                .show();
+                    } break;
+
+                    default: break;
+                }
+
+            } break;
+
+            default: break;
+
+      }
     }
 
 }

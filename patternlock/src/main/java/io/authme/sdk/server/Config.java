@@ -15,11 +15,16 @@ package io.authme.sdk.server;
 import android.app.Activity;
 import android.content.SharedPreferences;
 import android.text.TextUtils;
+import android.util.Log;
 import android.widget.Toast;
+
+import org.jboss.aerogear.security.otp.Totp;
 
 import java.util.UUID;
 
 public class Config {
+    public static final int LOGIN_PATTERN = 2, SIGNUP_PATTERN = 1,
+            INVALID_CONFIG = 3, RESULT_FAILED = 5, FORGOT_PATTERN = 6;
 
     public static final String PROD_HOST = "http://authme.io";
     public static final String PROD_SERVER_URL = PROD_HOST + ":3000/";
@@ -28,8 +33,11 @@ public class Config {
     public static final String SANDBOX_SERVER_URL = SANDBOX_HOST + ":3000/";
 
     private static final String STORED_VALUES = "STORED_VALUES";
-    private static final String API_KEY = "API_KEY", BYTE_ARRAY = "BYTE_ARRAY", EMAIL= "emailId",
-            DEVICE_ID = "deviceId", ENVIRONMENT = "environment", PRODUCTION = "PROD", SANDBOX = "TEST";
+    public static final String API_KEY = "API_KEY",
+            BYTE_ARRAY = "BYTE_ARRAY", EMAIL= "emailId",
+            DEVICE_ID = "deviceId", ENVIRONMENT = "environment",
+            PRODUCTION = "PROD", SANDBOX = "TEST",
+            SECRET_KEY = "secretkey";
     private SharedPreferences userpreference;
     private SharedPreferences.Editor editor;
     private Activity activity;
@@ -91,11 +99,6 @@ public class Config {
     }
 
     public void setEnvironment(String environment) {
-        if (!TextUtils.equals(environment, PRODUCTION) || !TextUtils.equals(environment, SANDBOX)) {
-            Toast.makeText(this.activity, "Invalid Environment", Toast.LENGTH_LONG)
-                    .show();
-            return;
-        }
         editor.putString(ENVIRONMENT, environment);
         editor.apply();
         editor.commit();
@@ -112,4 +115,57 @@ public class Config {
         }
     }
 
+    public void setSecretKey(String secretKey) {
+        editor.putString(SECRET_KEY, secretKey);
+        editor.apply();
+        editor.commit();
+    }
+
+    public String getOTP() {
+
+        String totpKey = userpreference.getString(SECRET_KEY, null);
+
+        if (TextUtils.isEmpty(totpKey)) {
+            return null;
+        }
+
+        Totp totpGenerator = new Totp(totpKey);
+        return totpGenerator.now();
+    }
+
+    public final static boolean isValidEmail(CharSequence target) {
+        if (TextUtils.isEmpty(target)) {
+            return false;
+        } else {
+            return android.util.Patterns.EMAIL_ADDRESS.matcher(target).matches();
+        }
+    }
+
+    public boolean isValidConfig() {
+        String email = getEmailId();
+        String API_Key = getApiKey();
+        String environment = userpreference.getString(ENVIRONMENT, null);
+
+        Log.d("AuthMeDebug", environment + "TEST");
+
+        if (!TextUtils.equals(environment, PRODUCTION) || !TextUtils.equals(environment, SANDBOX)) {
+            Toast.makeText(this.activity, "Invalid Environment", Toast.LENGTH_LONG)
+                    .show();
+            return false;
+        }
+
+        if (!isValidEmail(email)) {
+            Toast.makeText(this.activity, "Invalid Email", Toast.LENGTH_LONG)
+                    .show();
+            return false;
+        }
+
+        if (TextUtils.isEmpty(API_Key)) {
+            Toast.makeText(this.activity, "Invalid API KEY", Toast.LENGTH_LONG)
+                    .show();
+            return false;
+        }
+
+        return true;
+    }
 }
