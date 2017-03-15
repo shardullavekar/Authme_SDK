@@ -42,12 +42,12 @@ You will recieve a callback in onActivityResult method
       d. User forgot the pattern - in this case the resultCode would be RESULT_FORGOT_PATTERN
 
 
-      @Override
-      protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-           switch (requestCode) {
-                 case RESULT : {
-                      switch (resultCode) {
-                            case Config.SIGNUP_PATTERN : {
+         @Override
+             protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+                 switch (requestCode) {
+                     case RESULT : {
+                         switch (resultCode) {
+                             case Config.SIGNUP_PATTERN : {
                                  Toast.makeText(getApplicationContext(), "Sign up successfull", Toast.LENGTH_LONG)
                                          .show();
                              } break;
