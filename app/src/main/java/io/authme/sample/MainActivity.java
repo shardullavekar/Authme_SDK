@@ -63,7 +63,7 @@ public class MainActivity extends AppCompatActivity {
                                 .show();
                     } break;
 
-                    case Config.FORGOT_PATTERN : {
+                    case Config.RESET_PATTERN: {
                         Toast.makeText(getApplicationContext(), "Forgot Pattern", Toast.LENGTH_LONG)
                                 .show();
                     } break;

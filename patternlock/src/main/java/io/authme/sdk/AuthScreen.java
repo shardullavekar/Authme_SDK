@@ -35,7 +35,7 @@ import io.authme.sdk.server.Callback;
 import io.authme.sdk.server.Config;
 import io.authme.sdk.server.PostData;
 
-import static io.authme.sdk.server.Config.FORGOT_PATTERN;
+import static io.authme.sdk.server.Config.RESET_PATTERN;
 import static io.authme.sdk.server.Config.INVALID_CONFIG;
 import static io.authme.sdk.server.Config.LOGIN_PATTERN;
 import static io.authme.sdk.server.Config.RESULT_FAILED;
@@ -45,7 +45,7 @@ import static io.authme.sdk.server.Config.SIGNUP_PATTERN;
 public class AuthScreen extends Activity {
 
     private static final String AUTHMEIO = "AUTHMEIO";
-    private String referenceId;
+    private String referenceId, resetKey = null;
     private Config config;
 
     public AuthScreen() {
@@ -66,6 +66,10 @@ public class AuthScreen extends Activity {
         }
         else {
             referenceId = UUID.randomUUID().toString();
+        }
+
+        if (getIntent().hasExtra("resetKey")) {
+            resetKey = getIntent().getStringExtra("resetKey");
         }
 
         startExecution();
@@ -148,10 +152,10 @@ public class AuthScreen extends Activity {
                         clearJson();
                         endActivity(RESULT_FAILED);
                         break;
-                    case FORGOT_PATTERN:
+                    case RESET_PATTERN:
                         Toast.makeText(AuthScreen.this, "Forgot pattern", Toast.LENGTH_SHORT).show();
                         clearJson();
-                        endActivity(FORGOT_PATTERN);
+                        endActivity(RESET_PATTERN);
                         break;
                 }
             }
@@ -258,6 +262,9 @@ public class AuthScreen extends Activity {
                         config.setSecretKey(data.getString("Key"));
                         endActivity(SIGNUP_PATTERN);
                     }
+                    else if (jsonObject.getInt("Status") == 200) {
+                        endActivity(RESET_PATTERN);
+                    }
                     else{
                         endActivity(RESULT_FAILED, response);
                     }
@@ -278,6 +285,15 @@ public class AuthScreen extends Activity {
         } catch (JSONException e) {
             e.printStackTrace();
         }
+
+        if (!TextUtils.isEmpty(resetKey)) {
+            try {
+                request.put("ResetKey", resetKey);
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
+
         try {
             new PostData(callback).runPost(config.getServerURL() + "user/new", request.toString());
         } catch (IOException e) {

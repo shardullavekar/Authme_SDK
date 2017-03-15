@@ -15,7 +15,6 @@ package io.authme.sdk.server;
 import android.app.Activity;
 import android.content.SharedPreferences;
 import android.text.TextUtils;
-import android.util.Log;
 import android.widget.Toast;
 
 import org.jboss.aerogear.security.otp.Totp;
@@ -24,7 +23,7 @@ import java.util.UUID;
 
 public class Config {
     public static final int LOGIN_PATTERN = 2, SIGNUP_PATTERN = 1,
-            INVALID_CONFIG = 3, RESULT_FAILED = 5, FORGOT_PATTERN = 6;
+            INVALID_CONFIG = 3, RESULT_FAILED = 5, RESET_PATTERN = 6;
 
     public static final String PROD_HOST = "http://authme.io";
     public static final String PROD_SERVER_URL = PROD_HOST + ":3000/";
@@ -145,8 +144,6 @@ public class Config {
         String email = getEmailId();
         String API_Key = getApiKey();
         String environment = userpreference.getString(ENVIRONMENT, null);
-
-        Log.d("AuthMeDebug", environment + "TEST");
 
         if (!TextUtils.equals(environment, PRODUCTION) && !TextUtils.equals(environment, SANDBOX)) {
             Toast.makeText(this.activity, "Invalid Environment", Toast.LENGTH_LONG)
