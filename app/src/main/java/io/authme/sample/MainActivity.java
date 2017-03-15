@@ -27,9 +27,9 @@ public class MainActivity extends AppCompatActivity {
 
         Config config = new Config(MainActivity.this);
 
-        config.setEnvironment(Config.PRODUCTION);
+        config.setEnvironment(Config.SANDBOX); //Change this to Config.PRODUCTION when you are ready
 
-        config.setAPIKey("YOUR_API_KEY_HERE");
+        config.setAPIKey("YOUR_API_KEY_HERE"); //Remember that the keys are different for sandbox and production
 
         config.setEmailId("USER_EMAIL_ID_HERE");
 
