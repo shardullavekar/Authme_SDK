@@ -1,4 +1,33 @@
 apply plugin: 'com.android.library'
+apply plugin: 'com.jfrog.bintray'
+apply plugin: 'com.github.dcendents.android-maven'
+
+Properties properties = new Properties()
+properties.load(project.rootProject.file('local.properties').newDataInputStream())
+
+ext {
+    bintrayRepo = 'authmeio'
+    bintrayName = 'authme-sdk'
+
+    publishedGroupId = 'io.authme.sdk'
+    libraryName = 'authme'
+    artifact = 'authme-sdk'
+
+    libraryDescription = 'AuthMe helps you replace passwords in your app.'
+
+    siteUrl = 'https://authme.io'
+    gitUrl = 'https://github.com/shardullavekar/Authme_SDK.git'
+
+    libraryVersion = '0.1.0'
+
+    developerId = 'shardullavekar'
+    developerName = 'Shardul Lavekar'
+    developerEmail = 'developer.authme@gmail.com'
+
+    licenseName = 'The Apache Software License, Version 2.0'
+    licenseUrl = 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+    allLicenses = ["Apache-2.0"]
+}
 
 android {
     compileSdkVersion 23
@@ -45,3 +74,6 @@ dependencies {
     compile 'com.android.support:appcompat-v7:23.2.1'
     compile 'org.jboss.aerogear:aerogear-otp-java:1.0.0'
 }
+
+apply from: 'https://raw.githubusercontent.com/nuuneoi/JCenter/master/installv1.gradle'
+apply from: 'https://raw.githubusercontent.com/nuuneoi/JCenter/master/bintrayv1.gradle'

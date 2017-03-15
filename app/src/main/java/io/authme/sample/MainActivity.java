@@ -10,8 +10,6 @@ import android.widget.Toast;
 import io.authme.sdk.AuthScreen;
 import io.authme.sdk.server.Config;
 
-import static io.authme.sdk.server.Config.STORED_VALUES;
-
 
 public class MainActivity extends AppCompatActivity {
 
@@ -22,8 +20,6 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
-        MainActivity.this.getSharedPreferences(STORED_VALUES, 0).edit().clear().commit();
 
         Config config = new Config(MainActivity.this);
 
@@ -64,7 +60,7 @@ public class MainActivity extends AppCompatActivity {
                     } break;
 
                     case Config.RESET_PATTERN: {
-                        Toast.makeText(getApplicationContext(), "Forgot Pattern", Toast.LENGTH_LONG)
+                        Toast.makeText(getApplicationContext(), "Reset Pattern", Toast.LENGTH_LONG)
                                 .show();
                     } break;
 
