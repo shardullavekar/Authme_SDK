@@ -10,6 +10,8 @@ import android.widget.Toast;
 import io.authme.sdk.AuthScreen;
 import io.authme.sdk.server.Config;
 
+import static io.authme.sdk.server.Config.STORED_VALUES;
+
 
 public class MainActivity extends AppCompatActivity {
 
@@ -21,13 +23,15 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        MainActivity.this.getSharedPreferences(STORED_VALUES, 0).edit().clear().commit();
+
         Config config = new Config(MainActivity.this);
 
         config.setEnvironment(Config.PRODUCTION);
 
         config.setAPIKey("YOUR_API_KEY_HERE");
 
-        config.setEmailId("USER_EMAIL_ID");
+        config.setEmailId("USER_EMAIL_ID_HERE");
 
         patternbutton = (Button) this.findViewById(R.id.pattern_button);
 
@@ -67,6 +71,10 @@ public class MainActivity extends AppCompatActivity {
                     case Config.RESULT_FAILED : {
                         Toast.makeText(getApplicationContext(), "Failed To Identify", Toast.LENGTH_LONG)
                                 .show();
+                        if (data.hasExtra("response")) {
+                            Toast.makeText(getApplicationContext(), data.getStringExtra("response"), Toast.LENGTH_LONG)
+                                    .show();
+                        }
                     } break;
 
                     default: break;

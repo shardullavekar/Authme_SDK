@@ -32,7 +32,7 @@ public class Config {
     public static final String SANDBOX_HOST = "";
     public static final String SANDBOX_SERVER_URL = SANDBOX_HOST + ":3000/";
 
-    private static final String STORED_VALUES = "STORED_VALUES";
+    public static final String STORED_VALUES = "STORED_VALUES";
     public static final String API_KEY = "API_KEY",
             BYTE_ARRAY = "BYTE_ARRAY", EMAIL= "emailId",
             DEVICE_ID = "deviceId", ENVIRONMENT = "environment",
@@ -148,7 +148,7 @@ public class Config {
 
         Log.d("AuthMeDebug", environment + "TEST");
 
-        if (!TextUtils.equals(environment, PRODUCTION) || !TextUtils.equals(environment, SANDBOX)) {
+        if (!TextUtils.equals(environment, PRODUCTION) && !TextUtils.equals(environment, SANDBOX)) {
             Toast.makeText(this.activity, "Invalid Environment", Toast.LENGTH_LONG)
                     .show();
             return false;

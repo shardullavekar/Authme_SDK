@@ -18,10 +18,8 @@ package io.authme.sdk;
 
 import android.app.Activity;
 import android.content.Intent;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
@@ -215,6 +213,7 @@ public class AuthScreen extends Activity {
                 e.printStackTrace();
             }
         } else {
+            endActivity(RESULT_FAILED, "Unable to fetch sensor data");
             return;
         }
 
@@ -231,7 +230,7 @@ public class AuthScreen extends Activity {
         try {
             postData.runPost(config.getServerURL() + "api/sensor", jsonObject.toString());
         } catch (IOException e) {
-            Log.e(AUTHMEIO, "Failed to post result to sensor: ", e);
+            endActivity(RESULT_FAILED, "Failed to post result to sensor API");
         }
     }
 
@@ -244,6 +243,7 @@ public class AuthScreen extends Activity {
         Intent intent = new Intent();
         intent.putExtra("response", data);
         setResult(result, intent);
+        AuthScreen.this.finish();
     }
 
     private void completeSignup() {
@@ -258,51 +258,32 @@ public class AuthScreen extends Activity {
                         config.setSecretKey(data.getString("Key"));
                         endActivity(SIGNUP_PATTERN);
                     }
+                    else{
+                        endActivity(RESULT_FAILED, response);
+                    }
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
             }
         };
 
-        new SignupUser(callback).execute();
-
-    }
-
-    private class SignupUser extends AsyncTask<Void, Void, Void> {
-        Callback callback;
-        public SignupUser(Callback callback) {
-            this.callback = callback;
+        JSONObject request = new JSONObject();
+        try {
+            request.put("Identifier", config.getDeviceId());
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        try {
+            request.put("Email", config.getEmailId());
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        try {
+            new PostData(callback).runPost(config.getServerURL() + "user/new", request.toString());
+        } catch (IOException e) {
+            e.printStackTrace();
+            endActivity(RESULT_FAILED);
         }
 
-        @Override
-        protected Void doInBackground(Void... params) {
-            postRequest();
-            return null;
-        }
-
-        private void postRequest() {
-            JSONObject request = new JSONObject();
-            try {
-                request.put("Identifier", config.getDeviceId());
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
-            try {
-                request.put("Email", config.getEmailId());
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
-            try {
-                new PostData(callback).runPost(config.getServerURL() + "user/new", request.toString());
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-
-        }
-
-        @Override
-        protected void onPostExecute(Void aVoid) {
-            super.onPostExecute(aVoid);
-        }
     }
 }
