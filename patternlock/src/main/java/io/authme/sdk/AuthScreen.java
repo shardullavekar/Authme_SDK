@@ -195,7 +195,7 @@ public class AuthScreen extends Activity {
             }
         };
 
-        io.authme.sdk.server.PostData postOtp = new io.authme.sdk.server.PostData(otp_callback);
+        io.authme.sdk.server.PostData postOtp = new io.authme.sdk.server.PostData(otp_callback, config.getApiKey());
 
         try {
             postOtp.runPost(config.getServerURL() + "api/otp", otpObject.toString());
@@ -230,7 +230,7 @@ public class AuthScreen extends Activity {
             }
         };
 
-        io.authme.sdk.server.PostData postData = new io.authme.sdk.server.PostData(callback);
+        io.authme.sdk.server.PostData postData = new io.authme.sdk.server.PostData(callback, config.getApiKey());
         try {
             postData.runPost(config.getServerURL() + "api/sensor", jsonObject.toString());
         } catch (IOException e) {
@@ -295,7 +295,7 @@ public class AuthScreen extends Activity {
         }
 
         try {
-            new PostData(callback).runPost(config.getServerURL() + "user/new", request.toString());
+            new PostData(callback, config.getApiKey()).runPost(config.getServerURL() + "user/new", request.toString());
         } catch (IOException e) {
             e.printStackTrace();
             endActivity(RESULT_FAILED);
