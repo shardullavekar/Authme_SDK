@@ -25,10 +25,10 @@ public class Config {
     public static final int LOGIN_PATTERN = 2, SIGNUP_PATTERN = 1,
             INVALID_CONFIG = 3, RESULT_FAILED = 5, RESET_PATTERN = 6;
 
-    public static final String PROD_HOST = "https://api.authme.authme.host";
+    public static final String PROD_HOST = "https://api.authme.authme.host/";
     public static final String PROD_SERVER_URL = PROD_HOST;
 
-    public static final String SANDBOX_HOST = "https://api.authme.authme.xyz";
+    public static final String SANDBOX_HOST = "https://api.authme.authme.xyz/";
     public static final String SANDBOX_SERVER_URL = SANDBOX_HOST;
 
     public static final String STORED_VALUES = "STORED_VALUES";
