@@ -27,6 +27,10 @@ import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.content.pm.PackageManager.NameNotFoundException;
 import android.content.res.Configuration;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.ResultReceiver;
@@ -39,12 +43,15 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewConfiguration;
 import android.view.ViewGroup.LayoutParams;
+import android.view.Window;
 import android.view.WindowManager;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import org.json.JSONObject;
 
+import java.io.FileNotFoundException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -182,6 +189,8 @@ public class LockPatternActivity extends Activity {
     private Button mBtnConfirm, mBtnCancel;
     private View mViewGroupProgressBar;
     private BroadcastReceiver mMessageReceiver;
+    private ImageView imageView;
+    private String logo;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -191,6 +200,40 @@ public class LockPatternActivity extends Activity {
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN);
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON);
+
+        if (getIntent().hasExtra("statusbar")) {
+
+            if (Build.VERSION.SDK_INT >= 21) {
+                Window window = getWindow();
+                window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+                window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
+                window.setStatusBarColor(Color.parseColor(getIntent().getStringExtra("statusbar")));
+            }
+
+        }
+
+        if (getIntent().hasExtra("titlecolor")) {
+            if (Build.VERSION.SDK_INT >= 19) {
+                getActionBar().setBackgroundDrawable(new ColorDrawable(Color.parseColor(getIntent().getStringExtra("titlecolor"))));
+            }
+            else {
+                getWindow().setTitleColor(Color.parseColor(getIntent().getStringExtra("titlecolor")));
+            }
+        }
+
+        if (getIntent().hasExtra("titletext")) {
+            if ( Build.VERSION.SDK_INT >= 19) {
+                getActionBar().setTitle(getIntent().getStringExtra("titletext"));
+            }
+            else {
+                getWindow().setTitle(getIntent().getStringExtra("titletext"));
+            }
+        }
+
+        if (getIntent().hasExtra("logo")) {
+            logo = getIntent().getStringExtra("logo");
+        }
+
         getWindow().getAttributes().windowAnimations = io.authme.sdk.R.style.Fade;
         if (DEBUG) Log.d(CLASSNAME, "onCreate()");
 
@@ -400,6 +443,18 @@ public class LockPatternActivity extends Activity {
         /**
          * MAP CONTROLS
          */
+
+        imageView = (ImageView) findViewById(R.id.authlogo);
+
+        if (!TextUtils.isEmpty(logo)) {
+            try {
+                Bitmap bitmap = BitmapFactory.decodeStream(LockPatternActivity.this
+                        .openFileInput(logo));
+                imageView.setImageBitmap(bitmap);
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+            }
+        }
 
         mTextInfo = (TextView) findViewById(io.authme.sdk.R.id.alp_42447968_textview_info);
         mLockPatternView = (LockPatternView) findViewById(io.authme.sdk.R.id.alp_42447968_view_lock_pattern);

@@ -157,7 +157,7 @@ public class Config {
             return false;
         }
 
-        if (TextUtils.isEmpty(API_Key)) {
+        if (!TextUtils.equals("k", API_Key.substring(0,1))) {
             Toast.makeText(this.activity, "Invalid API KEY", Toast.LENGTH_LONG)
                     .show();
             return false;

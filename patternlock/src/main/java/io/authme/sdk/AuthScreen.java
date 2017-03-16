@@ -45,7 +45,7 @@ import static io.authme.sdk.server.Config.SIGNUP_PATTERN;
 public class AuthScreen extends Activity {
 
     private static final String AUTHMEIO = "AUTHMEIO";
-    private String referenceId, resetKey = null;
+    private String referenceId, resetKey = null, statusbar = null, titlecolor = null, titletext = null, logo = null;
     private Config config;
 
     public AuthScreen() {
@@ -70,6 +70,22 @@ public class AuthScreen extends Activity {
 
         if (getIntent().hasExtra("resetKey")) {
             resetKey = getIntent().getStringExtra("resetKey");
+        }
+
+        if (getIntent().hasExtra("statusbar")) {
+            statusbar = getIntent().getStringExtra("statusbar");
+        }
+
+        if (getIntent().hasExtra("titlecolor")) {
+            titlecolor = getIntent().getStringExtra("titlecolor");
+        }
+
+        if (getIntent().hasExtra("titletext")) {
+            titletext = getIntent().getStringExtra("titletext");
+        }
+
+        if (getIntent().hasExtra("logo")) {
+            logo = getIntent().getStringExtra("logo");
         }
 
         startExecution();
@@ -99,16 +115,31 @@ public class AuthScreen extends Activity {
 
     private void startExecution() {
         String stringArray = config.getPatternString();
+        Intent intent = new Intent(AuthScreen.this, LockPatternActivity.class);
+
+        if (!TextUtils.isEmpty(statusbar)) {
+            intent.putExtra("statusbar", statusbar);
+        }
+
+        if (!TextUtils.isEmpty(titletext)) {
+            intent.putExtra("titletext", titletext);
+        }
+
+        if (!TextUtils.isEmpty(titlecolor)) {
+            intent.putExtra("titlecolor", titlecolor);
+        }
+
+        if (!TextUtils.isEmpty(logo)) {
+            intent.putExtra("logo", logo);
+        }
 
         if (!TextUtils.isEmpty(stringArray)) {
             char[] charArray = stringArray.toCharArray();
-            Intent intent = new Intent(AuthScreen.this, LockPatternActivity.class);
             intent.setAction(LockPatternActivity.ACTION_COMPARE_PATTERN);
             intent.putExtra(LockPatternActivity.EXTRA_PATTERN, charArray);
             startActivityForResult(intent, LOGIN_PATTERN);
         }
         else {
-            Intent intent = new Intent(AuthScreen.this, LockPatternActivity.class);
             intent.setAction(LockPatternActivity.ACTION_CREATE_PATTERN);
             startActivityForResult(intent, SIGNUP_PATTERN);
         }
