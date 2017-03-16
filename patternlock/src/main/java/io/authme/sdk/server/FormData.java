@@ -13,8 +13,6 @@ package io.authme.sdk.server;
    limitations under the License.
 */
 
-import android.util.Log;
-
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -146,7 +144,6 @@ public class FormData {
             sensorsIp.put("co_ordinates", xyArray);
             sensorsIp.put("velocity", velocityArray);
             sensorsIp.put("orient_sensor", orientArary);
-            Log.d("OrientationArray", orientArary.toString());
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -157,7 +154,6 @@ public class FormData {
         } catch (JSONException e) {
             e.printStackTrace();
         }
-        Log.d("biggerJSon", biggerJSon.toString());
         return biggerJSon;
     }
 
