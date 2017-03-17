@@ -324,7 +324,7 @@ public class LockPatternView extends View implements SensorEventListener {
      * @author Thomas Breitbach
      * @since v2.7 beta
      */
-    public static final int MATRIX_WIDTH = 3;
+    public static final int MATRIX_WIDTH = 4;
 
     /**
      * The size of the pattern's matrix.
